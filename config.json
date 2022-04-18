@@ -23,7 +23,6 @@
         ]
     },
     "coordinator": "4",
-    "env": "dev",
     "nodeSet": "auto",
     "currentNode": "6",
     "Nw": 3,

@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # Connect!
     buffered_transport.open()
 
-    client.write_to_file('test2.txt', "aaaa")
+    client.write_to_file('test.txt', "aaaa")
     client.write_to_file('test.txt', "bbb")
     client.write_to_file('test.txt', "ccc")
     client.write_to_file('testy.txt', "aaaa")

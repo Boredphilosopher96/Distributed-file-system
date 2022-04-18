@@ -143,6 +143,7 @@ class ServerHandler:
             self.file_list[file_name].release()
 
     def read_from_file(self, file_name: str) -> str:
+        print(f"Trying to read the file {file_name}")
         # If the current node is not the coordinator, just forward the request to the coordinator
         if not self.is_coordinator:
             coordinator_client: ServerInterface.Client = self.get_client(self.coordinator)
@@ -155,9 +156,11 @@ class ServerHandler:
             return f.read()
 
     def get_file_version(self, file_name: str) -> int:
+        print(f"Version number for file {file_name} : {self.version_info.get(file_name, -1)}")
         return self.version_info.get(file_name, -1)
 
     def append_to_specific_file(self, file_name: str, update: str, version_number: int) -> str:
+        print(f"Updating file {file_name} to version {version_number}")
         with open(self.__get_file_path(file_name), 'a') as f:
             f.write(f"{update}\n")
 
@@ -167,6 +170,7 @@ class ServerHandler:
             return f.read()
 
     def update_file_to_text(self, file_name: str, new_file: str, version_number: int) -> str:
+        print(f"Updating file {file_name} to version {version_number}")
         with open(self.__get_file_path(file_name), 'w') as f:
             f.write(new_file)
 
@@ -226,7 +230,9 @@ class ServerHandler:
                 self.file_list[file_name].release()
 
     def write_to_file(self, file_name: str, string_to_append: str) -> str:
+        print(f"Received request to write to file {file_name}")
         if not self.is_coordinator:
+            print(f"Forwarding request to coordinator {self.coordinator}")
             coordinator_client: Union[ServerInterface.Client, 'ServerHandler'] = self.get_client(self.coordinator)
             return coordinator_client.forwarded_write_to_file(file_name, string_to_append, self.node_id)
         else:
