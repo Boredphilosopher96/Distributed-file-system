@@ -38,14 +38,14 @@ if __name__ == '__main__':
                 try:
                     client = get_client(command_line[1])
                 except Exception as e:
-                    raise ttypes.CustomException(f"Cannot connect to client {command_line[1]}. Please ensure it is a valid client")
+                    raise ttypes.CustomException(f"Cannot connect to server {command_line[1]}. Please ensure it is a valid server")
             elif command_line[0] == "read":
                 try:
                     print(client.read_from_file(command_line[1]))
                 except ttypes.CustomException as e:
                     print(f"{e}")
                 except Exception as e:
-                    raise ttypes.CustomException(f"Error reading from file {command_line[1]}. Please ensure you have a valid client")
+                    raise ttypes.CustomException(f"Error reading from file {command_line[1]}. Please ensure you have server")
             elif command_line[0] == "write":
                 try:
                     client.write_to_file(command_line[1], command_line[2])
@@ -53,7 +53,7 @@ if __name__ == '__main__':
                     print(f"{e}")
                 except Exception as e:
                     raise ttypes.CustomException(
-                        f"Error writing to file {command_line[1]}. Please ensure you have a valid client and your update is valid")
+                        f"Error writing to file {command_line[1]}. Please ensure you have a valid server and your update is valid")
             else:
                 raise ttypes.CustomException(
                     f"Invalid command. Only 3 commands allowed - client, read and write. Sent command {command_line[0]}")

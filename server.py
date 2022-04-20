@@ -280,7 +280,7 @@ if __name__ == '__main__':
         ServerInterface.Processor(handler)
     )
 
-    transport = TSocket.TServerSocket(host=current_node_info[0], port=current_node_info[1])
+    transport = TSocket.TServerSocket(port=current_node_info[1])
 
     tfactory = TTransport.TBufferedTransportFactory()
     pfactory = TBinaryProtocol.TBinaryProtocolFactory()
