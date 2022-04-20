@@ -2,6 +2,7 @@ import glob
 import os
 import random
 import shutil
+import socket
 import timeit
 from threading import Lock
 from typing import List, Union
@@ -264,9 +265,8 @@ if __name__ == '__main__':
 
     # If node set is set to auto, it will auto increment in config
     if utils.CONFIG["nodeSet"] == "auto":
-        current_node = str(int(current_node) + 1)
         new_config = utils.CONFIG.copy()
-        new_config["currentNode"] = current_node
+        new_config["currentNode"] = str(int(current_node) + 1)
         utils.modify_config(new_config)
 
     # Because it implements multiple interfaces, register all the processors with name given in config file
@@ -286,5 +286,5 @@ if __name__ == '__main__':
     pfactory = TBinaryProtocol.TBinaryProtocolFactory()
     server = TServer.TThreadedServer(processor, transport, tfactory, pfactory)
 
-    print(f'Starting the server at ip:{current_node_info[0]} and port: {current_node_info[1]}')
+    print(f'Starting the server {current_node} at {socket.getfqdn(socket.gethostname())} port: {current_node_info[1]}')
     server.serve()

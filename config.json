@@ -40,7 +40,7 @@
     },
     "coordinator": "3",
     "nodeSet": "auto",
-    "currentNode": "10",
+    "currentNode": "5",
     "Nw": 7,
     "Nr": 3,
     "filesSource": "./source/"
