@@ -22,10 +22,11 @@ service ServerInterface {
 
     string update_file_to_text(1:string file_name, 2:string new_file, 3:i32 version_number) throws (1: CustomException custom_exception),
 
-    // If the current file server is not the coordinator, it forwards the next 3 requests to the coordinator
-    string forwarded_read_from_file(1:string file_name, 2:string node_to_exclude) throws (1: CustomException custom_exception),
-
     string read_file_from_node(1:string file_name) throws (1: CustomException custom_exception),
+
+    // If the current file server is not the coordinator, it forwards the next 2 requests to the coordinator
+    // Added this node_to_exclude in case we wanted to account for node failures, but since we are not handling it, it is kept empty for all requests
+    string forwarded_read_from_file(1:string file_name, 2:string node_to_exclude) throws (1: CustomException custom_exception),
 
     string forwarded_write_to_file(1:string file_name, 2:string update, 3:string node_to_exclude) throws (1: CustomException custom_exception)
 }

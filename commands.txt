@@ -1,0 +1,17 @@
+client 3
+read test.txt
+write test.txt aaa_3
+client 5
+write test.txt aaa_5
+write test.txt bbb_5
+write test.txt ccc_5
+write test.txt ddd_5
+write test.txt eee_5
+write test.txt fff_5
+write test.txt ggg_5
+client 1
+write test.txt aaa_1
+write test.txt bbb_1
+write test.txt ccc_1
+write test.txt ddd_1
+read test.txt

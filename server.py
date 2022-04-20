@@ -2,6 +2,7 @@ import glob
 import os
 import random
 import shutil
+import timeit
 from threading import Lock
 from typing import List, Union
 
@@ -21,7 +22,7 @@ Assumptions:
  1. Update can only be done with append to files
  2. When you initialize the servers, there is an original copy of the file which all the other servers copy
  3. Update operations can only be append to files
- 4. All files are in the project directory and they are in a folder called data
+ 4. All files are in the project directory and they are in a folder set in config
 """
 
 
@@ -144,12 +145,16 @@ class ServerHandler:
 
     def read_from_file(self, file_name: str) -> str:
         print(f"Trying to read the file {file_name}")
+        start = timeit.default_timer()
         # If the current node is not the coordinator, just forward the request to the coordinator
         if not self.is_coordinator:
             coordinator_client: ServerInterface.Client = self.get_client(self.coordinator)
-            return coordinator_client.forwarded_read_from_file(file_name, self.node_id)
+            result = coordinator_client.forwarded_read_from_file(file_name, '')
         else:
-            return self.forwarded_read_from_file(file_name, node_to_exclude="")
+            result = self.forwarded_read_from_file(file_name, node_to_exclude="")
+        end = timeit.default_timer()
+        print(f"Time elapsed for reading from file {file_name} is {end - start} seconds")
+        return result
 
     def read_file_from_node(self, file_name: str) -> str:
         with open(self.__get_file_path(file_name)) as f:
@@ -194,6 +199,7 @@ class ServerHandler:
             max_version_number = -1
             max_version_client = None
             node_with_max_id = self.node_id
+            # Get the file server with the highest version file
             for quorum_node in write_quorum_nodes:
                 quorum_client = self.get_client(quorum_node)
                 quorum_node_file_version = quorum_client.get_file_version(file_name)
@@ -208,6 +214,7 @@ class ServerHandler:
             if max_version_client is None:
                 raise ttypes.CustomException(message="One of the members of write quorum does not have the file")
 
+            # Ask the node with updated file to
             updated_file_content = max_version_client.append_to_specific_file(file_name, update, max_version_number + 1)
 
             for quorum_node in write_quorum_nodes:
@@ -231,16 +238,23 @@ class ServerHandler:
 
     def write_to_file(self, file_name: str, string_to_append: str) -> str:
         print(f"Received request to write to file {file_name}")
+        start = timeit.default_timer()
         if not self.is_coordinator:
             print(f"Forwarding request to coordinator {self.coordinator}")
             coordinator_client: Union[ServerInterface.Client, 'ServerHandler'] = self.get_client(self.coordinator)
-            return coordinator_client.forwarded_write_to_file(file_name, string_to_append, self.node_id)
+            result = coordinator_client.forwarded_write_to_file(file_name, string_to_append, '')
         else:
-            return self.forwarded_write_to_file(file_name, string_to_append, node_to_exclude="")
+            result = self.forwarded_write_to_file(file_name, string_to_append, node_to_exclude="")
+        end = timeit.default_timer()
+        print(f"Time elapsed to write to file {file_name} is {end - start} seconds")
+        return result
 
 
 if __name__ == '__main__':
     current_node = utils.CONFIG["currentNode"]
+    if current_node not in utils.CONFIG["nodeInfo"]:
+        raise ttypes.CustomException(message="The current node info is not in the configuration file")
+
     handler = ServerHandler(current_node, node_info=utils.CONFIG["nodeInfo"],
                             coordinator=utils.CONFIG["coordinator"],
                             n_read_quorum=utils.CONFIG["Nr"], n_write_quorum=utils.CONFIG["Nw"],
@@ -272,5 +286,5 @@ if __name__ == '__main__':
     pfactory = TBinaryProtocol.TBinaryProtocolFactory()
     server = TServer.TThreadedServer(processor, transport, tfactory, pfactory)
 
-    print('Starting the server')
+    print(f'Starting the server at ip:{current_node_info[0]} and port: {current_node_info[1]}')
     server.serve()
